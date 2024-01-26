@@ -1,0 +1,4 @@
+# gitignore file for nodejs project
+
+node_modules
+.env
