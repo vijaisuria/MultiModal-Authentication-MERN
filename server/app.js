@@ -18,7 +18,12 @@ mongoose
 // Middleware
 app.use(express.json());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(
   session({ secret: "your-secret-key", resave: true, saveUninitialized: true })

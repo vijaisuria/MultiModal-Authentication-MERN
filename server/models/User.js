@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   googleId: String,
   facebookId: String,
+  profilePicture: String,
 });
 
 const User = mongoose.model("User", userSchema);

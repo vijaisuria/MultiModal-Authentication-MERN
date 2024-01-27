@@ -3,6 +3,7 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("../models/User");
+require("dotenv").config();
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -47,6 +48,7 @@ passport.use(
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "http://localhost:3001/auth/google/callback",
+      scope: ["profile", "email"],
     },
     (accessToken, refreshToken, profile, done) => {
       User.findOne({ googleId: profile.id }).then((currentUser) => {
@@ -56,6 +58,8 @@ passport.use(
           new User({
             googleId: profile.id,
             username: profile.displayName,
+            email: profile.emails[0].value,
+            profilePicture: profile.photos[0].value,
           })
             .save()
             .then((newUser) => {
