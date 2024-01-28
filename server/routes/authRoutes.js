@@ -3,9 +3,35 @@ const passport = require("passport");
 const router = express.Router();
 
 // Local Authentication
-router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ user: req.user });
-});
+// router.post(
+//   "/login",
+//   passport.authenticate("local", { failureRedirect: "/login/failed" }),
+//   function (req, res) {
+//     console.log("Login Success");
+//     console.log(req.user);
+
+//     req.login(req.user, (err) => {
+//       if (err) {
+//         console.error(err);
+//         return res
+//           .status(500)
+//           .json({ error: true, message: "Internal Server Error" });
+//       }
+
+//       res.redirect(process.env.CLIENT_URL);
+//     });
+//   }
+// );
+
+// Local Authentication
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: process.env.CLIENT_URL,
+    failureRedirect: "/auth/login-failure",
+    failureFlash: true,
+  })
+);
 
 // Google Authentication
 router.get("/google", passport.authenticate("google", ["profile", "email"]));
@@ -13,7 +39,7 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login/failed",
+    failureRedirect: "/auth/login/failed",
     successRedirect: process.env.CLIENT_URL,
   })
 );
