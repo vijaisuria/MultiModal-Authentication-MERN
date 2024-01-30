@@ -9,14 +9,19 @@ function Login() {
 
   const login = () => {
     axios
-      .post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        email: email,
-        password: password,
-      })
+      .post(
+        `${process.env.REACT_APP_API_URL}/auth/login`,
+        {
+          usernameOrEmail: email,
+          password: password,
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
-        console.log(res);
-        console.log(res.data);
-        window.open("http://localhost:3000/home");
+        if (res.status === 200) {
+          alert("Login Successful");
+          window.location.href = "/";
+        }
       })
       .catch((err) => {
         alert("Invalid Credentials");
