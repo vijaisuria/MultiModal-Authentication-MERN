@@ -5,32 +5,28 @@ const LocalStrategy = require("passport-local").Strategy;
 const User = require("../models/User");
 require("dotenv").config();
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  User.findById(id).then((user) => {
-    done(null, user);
-  });
-});
-
 // Local Strategy
 passport.use(
   new LocalStrategy(
-    { usernameField: "email" },
-    async (email, password, done) => {
+    { usernameField: "usernameOrEmail" },
+    async (usernameOrEmail, password, done) => {
       try {
-        const user = await User.findOne({ email: email });
+        usernameOrEmail = usernameOrEmail.toLowerCase();
+        const isEmail = usernameOrEmail.includes("@");
+        let user;
 
-        if (!user) {
-          return done(null, false, { message: "Incorrect email." });
+        if (isEmail) {
+          user = await User.findOne({ email: usernameOrEmail });
+        } else {
+          user = await User.findOne({ username: usernameOrEmail });
         }
 
-        const passwordMatch = user.password === password;
+        if (!user) {
+          return done(null, false, { message: "User does not exist" });
+        }
 
-        if (!passwordMatch) {
-          return done(null, false, { message: "Incorrect password." });
+        if (password !== user.password) {
+          return done(null, false, { message: "Invalid Password" });
         }
 
         return done(null, user);
@@ -98,3 +94,13 @@ passport.use(
     }
   )
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id).then((user) => {
+    done(null, user);
+  });
+});
